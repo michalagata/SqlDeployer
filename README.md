@@ -9,13 +9,15 @@ Usage:
   SqlDeployer [options]
 
 Options:
-  -c, -cs, --connectionstring, --connstring              You now provide an entire connection string. ServerName and
-  <connectionstring> (REQUIRED)                          Database are obsolete.
+  -c, -cs, --connectionstring, --connstring              You now provide an entire connection string.
+
   -f, --files, --sqlfilesdirectory <sqlfilesdirectory>   The directory where your SQL scripts are [default: .]
+
   -o, --output, --outputPath <outputPath>                This is where everything related to the migration is stored.
                                                          This includes any backups, all items that ran, permission
                                                          dumps, logs, etc. [default:
                                                          C:\Users\{username}\AppData\Local\sqldep]
+                                                         
   --folders <folders>                                    Folder configuration.
 
                                                          You can also specify a file name that has the same contents as
