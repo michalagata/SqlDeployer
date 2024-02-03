@@ -99,3 +99,41 @@ Options:
   <Critical|Debug|Error|Information|None|Trace|Warning>  https://docs.microsoft.com/dotnet/api/Microsoft.Extensions.Logging.LogLevel)
   
   -?, -h, --help                                         Show help and usage information
+
+  ## Directory roles and execution order
+
+  | Order                       | Directory                   | Purpose                                                                                      | Track script changes                                                       |
+|-----------------------------|-----------------------------|----------------------------------------------------------------------------------------------|----------------------------------------------------------------------------|
+| BeforeMigration             | PrepareForDeployment        | SQL Server Wide PReparation Scripts (ex. Replication Pausing, Database Creation)             | False                                                                      |
+| RunAfterCreateDatabase      | RunAfterCreateDatabase      | Scripts run after database is created (ex. Database Options)                                 | False                                                                      |
+| AlterDatabase               | AlterDatabase               | Scripts altering database itself (database wide, not schema objects!). Ex. Isolation Levels. | False                                                                      |
+| RunBeforeUp                 | RunBeforeMigration          | Scripts tpo be run before migration (ex. user disconnects, RESTRICTED_USER, SINGLE_USER)     | False                                                                      |
+| Up                          | Migrate                     | Default directory for the scripts (tables, schema/object alters, etc.)                       | False                                                                      |
+| RunFirstAfterUp             | RunFirstAfterMigration      | Scripts performed after the migration (ex. data manipulation)                                | False                                                                      |
+| Functions                   | Functions                   | Scripts creating/altering Functions                                                          | False                                                                      |
+| View                        | Views                       | Scripts creating/altering Views                                                              | False                                                                      |
+| StoredProcedures            | Sprocs                      | Scripts creating/altering Stored Procedures                                                  | False                                                                      |
+| Indexes                     | Indexes                     | Scripts creating/altering Indexes                                                            | False                                                                      |
+| Triggers                    | Triggers                    | Scripts creating/altering Triggers                                                           | False                                                                      |
+| Permissions                 | Permissions                 | Scripts creating/altering Permissions                                                        | False                                                                      |
+| RunAfterOtherAnyTimeScripts | RunAfterOtherAnyTimeScripts | Other scripts, that should be run                                                            | True (Existing scripts may be changed and shall be executed with tracking) |
+| AfterMigration              | AfterMigration              | Scripts run after whole migration (ex. database set MULTI_USER)                              | False                                                                      |
+
+## Example FolderConfig file
+
+```
+BeforeMigration=PrepareForDeployment
+AlterDatabase=AlterDatabase
+RunAfterCreateDatabase=RunAfterCreateDatabase
+RunBeforeUp=RunBeforeMigration
+Up=Migrate
+RunFirstAfterUp=RunFirstAfterMigration
+Functions=Functions
+Views=Views
+Sprocs=StoredProcedures
+Triggers=Triggers
+Indexes=Indexes
+RunAfterOtherAnyTimeScripts=RunAfterOtherAnyTimeScripts
+Permissions=Permissions
+AfterMigration=RunAfterMigration
+```
