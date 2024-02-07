@@ -99,6 +99,12 @@ Options:
   <Critical|Debug|Error|Information|None|Trace|Warning>  https://docs.microsoft.com/dotnet/api/Microsoft.Extensions.Logging.LogLevel)
   
   -?, -h, --help                                         Show help and usage information
+  
+  ## Scripts Exrcution Order
+  
+  Scripts within directories are being exrcuted in alphabetical order.
+  
+  Good practice is to name them with numbered prefix, ex. 00001-ScriptName.sql
 
   ## Directory roles and execution order
 
