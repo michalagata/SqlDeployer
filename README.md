@@ -58,6 +58,7 @@ Options:
                                                          set.
   
   --sc, --schema, --schemaname <schemaname>              The schema to use for the migration tables [default: sqldep]
+  
   -ni, --noninteractive, --silent                        Silent - instructs SqlDeployer not to ask for any input when
                                                          it runs.
   
@@ -108,18 +109,18 @@ Options:
 
   ## Directory roles and execution order
 
-  | Order                       | Directory                   | Purpose                                                                                      | Track script changes                                                       |
+| Order                       | Directory                   | Purpose                                                                                      | Track script changes                                                       |
 |-----------------------------|-----------------------------|----------------------------------------------------------------------------------------------|----------------------------------------------------------------------------|
-| BeforeMigration             | PrepareForDeployment        | SQL Server Wide PReparation Scripts (ex. Replication Pausing, Database Creation)             | False                                                                      |
+| BeforeMigration             | PrepareForDeployment        | SQL Server Wide PReparation Scripts (ex. Replication Pausing, Database Creation)             | True                                                                       |
 | RunAfterCreateDatabase      | RunAfterCreateDatabase      | Scripts run after database is created (ex. Database Options)                                 | False                                                                      |
-| AlterDatabase               | AlterDatabase               | Scripts altering database itself (database wide, not schema objects!). Ex. Isolation Levels. | False                                                                      |
+| AlterDatabase               | AlterDatabase               | Scripts altering database itself (database wide, not schema objects!). Ex. Isolation Levels. | True                                                                       |
 | RunBeforeUp                 | RunBeforeMigration          | Scripts tpo be run before migration (ex. user disconnects, RESTRICTED_USER, SINGLE_USER)     | False                                                                      |
 | Up                          | Migrate                     | Default directory for the scripts (tables, schema/object alters, etc.)                       | False                                                                      |
-| RunFirstAfterUp             | RunFirstAfterMigration      | Scripts performed after the migration (ex. data manipulation)                                | False                                                                      |
-| Functions                   | Functions                   | Scripts creating/altering Functions                                                          | False                                                                      |
-| View                        | Views                       | Scripts creating/altering Views                                                              | False                                                                      |
-| StoredProcedures            | Sprocs                      | Scripts creating/altering Stored Procedures                                                  | False                                                                      |
-| Indexes                     | Indexes                     | Scripts creating/altering Indexes                                                            | False                                                                      |
+| RunFirstAfterUp             | RunFirstAfterMigration      | Scripts performed after the migration (ex. data manipulation)                                | True                                                                       |
+| Functions                   | Functions                   | Scripts creating/altering Functions                                                          | True                                                                       |
+| View                        | Views                       | Scripts creating/altering Views                                                              | True                                                                       |
+| StoredProcedures            | Sprocs                      | Scripts creating/altering Stored Procedures                                                  | True                                                                       |
+| Indexes                     | Indexes                     | Scripts creating/altering Indexes                                                            | True                                                                       |
 | Triggers                    | Triggers                    | Scripts creating/altering Triggers                                                           | False                                                                      |
 | Permissions                 | Permissions                 | Scripts creating/altering Permissions                                                        | False                                                                      |
 | RunAfterOtherAnyTimeScripts | RunAfterOtherAnyTimeScripts | Other scripts, that should be run                                                            | True (Existing scripts may be changed and shall be executed with tracking) |
@@ -143,3 +144,11 @@ RunAfterOtherAnyTimeScripts=RunAfterOtherAnyTimeScripts
 Permissions=Permissions
 AfterMigration=RunAfterMigration
 ```
+    
+## Everytime Scripts
+    
+If you name your file with .EVERYTIME., SqlDeployer will run that file everytime, regardless of changes. For example, if you name a file Sth.EVERYTIME.sql or EVERYTIME.sth.sql, SqlDeployer will run that file on each migration.
+    
+## Environment Scripts
+  
+Environment Name - This allows SqlDeployer to be environment aware and only run scripts that are in a particular environment based on the name of the script. 'sth.ENV.LOCAL.sql' would only be run if --env=LOCAL was set.
