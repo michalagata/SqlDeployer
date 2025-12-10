@@ -38,8 +38,9 @@ Options:
 
   -a, -acs, -csa, --adminconnectionstring,               The connection string for connecting to master, if you want to
   --adminconnstring <adminconnectionstring>              create the database.  Defaults to the same as --connstring.
-  --accesstoken <accesstoken>                            Access token to be used for logging in to SQL Server / Azure
-                                                         SQL Database.
+  --accesstoken <accesstoken>                            (Optional) Access token for SQL Server / Azure SQL. When set,
+                                                         zostanie ustawiony na każdej SqlConnection; brak wartości
+                                                         pozostawia działanie bez zmian.
 
   -ct, --commandtimeout <commandtimeout>                 This is the timeout when commands are run. This is not for
                                                          admin commands or restore. [default: 60]
