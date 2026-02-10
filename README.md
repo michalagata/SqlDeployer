@@ -1,12 +1,83 @@
 # SqlDeployer
 SQL Migration Management and Deployment Tool
 
+[![NuGet](https://img.shields.io/nuget/v/SqlDeployer.Cli.svg)](https://www.nuget.org/packages/SqlDeployer.Cli/)
+[![License](https://img.shields.io/github/license/AnubisWorks/SqlDeployer)](LICENSE)
+
+## Features
+
+✅ **Multi-Database Support**
+- SQL Server
+- PostgreSQL
+- MariaDB / MySQL
+- Oracle
+- SQLite
+
+✅ **Migration Management**
+- Script-based migrations with numbered ordering
+- Environment-specific scripts
+- Transaction support
+- Token replacement
+- Pre/Post deployment scripts
+
+✅ **Reverse Engineering** (New in v10.3.0)
+- Extract database schema to SQL scripts
+- Support for all major database systems
+- Generate numbered migration baselines
+- Version control ready output
+
+✅ **Containerized Deployments**
+- Docker support
+- Kubernetes ready
+- CI/CD integration examples
+
+## Quick Start
+
+### Installation
+
+```bash
+# Install as global .NET tool
+dotnet tool install -g SqlDeployer.Cli
+
+# Verify installation
+sqldeployer --version
+```
+
+### Run Migrations
+
+```bash
+sqldeployer migrate \
+  --connectionstring "Server=localhost;Database=MyDb;..." \
+  --databasetype SQLServer \
+  --sqlfilesdirectory ./migrations
+```
+
+### Reverse Engineer Database
+
+```bash
+sqldeployer reverse \
+  --connectionstring "Server=localhost;Database=MyDb;..." \
+  --databasetype SQLServer \
+  --outputdirectory ./schema-baseline
+```
+
+## Documentation
+
+- [Getting Started](docs/GettingStarted.md)
+- [Reverse Engineering Guide](docs/ReverseEngineering.md)
+- [Configuration Options](docs/ConfigurationOptions/)
+- [Script Types](docs/ScriptTypes/)
+- [Docker Setup](docs/DOCKER_SETUP.md)
+- [Build and Deployment](docs/BUILD_AND_DEPLOYMENT.md)
+- [Test Configuration](docs/TEST_CONFIGURATION.md) - Fast vs Full Tests
+- [Token Replacement](docs/TokenReplacement.md)
+
 
 
 ## Command Line Switches
 
 Usage:
-  SqlDeployer [options]
+  dotnet SqlDeployer [options]
 
 Options:
   -c, -cs, --connectionstring, --connstring              You now provide an entire connection string.
@@ -38,9 +109,10 @@ Options:
 
   -a, -acs, -csa, --adminconnectionstring,               The connection string for connecting to master, if you want to
   --adminconnstring <adminconnectionstring>              create the database.  Defaults to the same as --connstring.
+  
   --accesstoken <accesstoken>                            (Optional) Access token for SQL Server / Azure SQL. When set,
-                                                         zostanie ustawiony na każdej SqlConnection; brak wartości
-                                                         pozostawia działanie bez zmian.
+                                                         it will be assigned to every SqlConnection; if not provided,
+                                                         the application functions as before without token.
 
   -ct, --commandtimeout <commandtimeout>                 This is the timeout when commands are run. This is not for
                                                          admin commands or restore. [default: 60]
@@ -52,6 +124,7 @@ Options:
   <mariadb|oracle|postgresql|sqlite|sqlserver>           [default: sqlserver]
   
   -t, --transaction, --trx                               Run the migration in a transaction
+
   --env, --environment <environment>                     Environment Name - This allows SqlDeployer to be environment
                                                          aware and only run scripts that are in a particular
                                                          environment based on the name of the script.
@@ -102,9 +175,9 @@ Options:
   
   -?, -h, --help                                         Show help and usage information
   
-  ## Scripts Exrcution Order
+  ## Scripts Execution Order
   
-  Scripts within directories are being exrcuted in alphabetical order.
+  Scripts within directories are being executed in alphabetical order.
   
   Good practice is to name them with numbered prefix, ex. 00001-ScriptName.sql
 
@@ -115,7 +188,7 @@ Options:
 | BeforeMigration             | PrepareForDeployment        | SQL Server Wide PReparation Scripts (ex. Replication Pausing, Database Creation)             | True                                                                       |
 | RunAfterCreateDatabase      | RunAfterCreateDatabase      | Scripts run after database is created (ex. Database Options)                                 | False                                                                      |
 | AlterDatabase               | AlterDatabase               | Scripts altering database itself (database wide, not schema objects!). Ex. Isolation Levels. | True                                                                       |
-| RunBeforeUp                 | RunBeforeMigration          | Scripts tpo be run before migration (ex. user disconnects, RESTRICTED_USER, SINGLE_USER)     | False                                                                      |
+| RunBeforeUp                 | RunBeforeMigration          | Scripts to be run before migration (ex. user disconnects, RESTRICTED_USER, SINGLE_USER)     | False                                                                      |
 | Up                          | Migrate                     | Default directory for the scripts (tables, schema/object alters, etc.)                       | False                                                                      |
 | RunFirstAfterUp             | RunFirstAfterMigration      | Scripts performed after the migration (ex. data manipulation)                                | True                                                                       |
 | Functions                   | Functions                   | Scripts creating/altering Functions                                                          | True                                                                       |
@@ -153,3 +226,21 @@ If you name your file with .EVERYTIME., SqlDeployer will run that file everytime
 ## Environment Scripts
   
 Environment Name - This allows SqlDeployer to be environment aware and only run scripts that are in a particular environment based on the name of the script. 'sth.ENV.LOCAL.sql' would only be run if --env=LOCAL was set.
+
+## Releases
+
+SqlDeployer releases are available on GitHub at [michalagata/SqlDeployer](https://github.com/michalagata/SqlDeployer).
+
+Each release includes:
+- Platform-specific ZIP archives (Linux, macOS, Windows)
+- `version.txt` file containing the release version
+- `README.md` file with documentation
+
+### Downloading Releases
+
+You can download the latest release from the [GitHub Releases page](https://github.com/michalagata/SqlDeployer/releases). Select the appropriate ZIP file for your platform:
+- `SqlDeployer.Linux.zip` - For Linux x64 systems
+- `SqlDeployer.macOS.zip` - For macOS systems
+- `SqlDeployer.Windows.zip` - For Windows x64 systems
+
+After downloading, extract the ZIP file and run the `SqlDeployer` executable from the extracted directory.
