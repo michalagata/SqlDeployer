@@ -1,7 +1,7 @@
 # SqlDeployer
 SQL Migration Management and Deployment Tool
 
-[![NuGet](https://img.shields.io/nuget/v/SqlDeployer.Cli.svg)](https://www.nuget.org/packages/SqlDeployer.Cli/)
+[![NuGet](https://img.shields.io/nuget/v/SqlDeployer.svg)](https://www.nuget.org/packages/SqlDeployer/)
 [![License](https://img.shields.io/github/license/AnubisWorks/SqlDeployer)](LICENSE)
 
 ## Features
@@ -26,6 +26,30 @@ SQL Migration Management and Deployment Tool
 - Generate numbered migration baselines
 - Version control ready output
 
+✅ **Enterprise Features** (New in v10.4.0)
+- Pre-migration backup (SQLite auto-copy, SQL Server BACKUP, advisory for PG/MariaDB/Oracle)
+- Verify scripts (`verify/` folder convention — auto-run after one-time migrations)
+- Shell script hooks (`before-migrate`, `after-migrate`, `before/after-each-script`, `on-error`)
+- 50 SQL lint rules (backward-incompatible changes, locking, security, schema design)
+- Migration simulation (`sqldeployer simulate` — test on shadow database copy)
+- Expand-contract pattern (`--strategy expand-contract`, `--finalize`)
+- Policy engine (`.sqldeployer-policy.json` — per-environment enforcement)
+- Signed audit trail (HMAC-SHA256, tamper detection, export JSON/CSV)
+- Approval gates (four-eyes principle — `sqldeployer approve`)
+- Encrypted connection vault (`sqldeployer vault set/get/list/delete`)
+- Impact analysis (`sqldeployer analyze` — risk scoring, dependency graph)
+- Multi-tenant migration (`--tenant-list`, per-tenant tracking, `--retry-failed`)
+- Performance profiling (`--profile` — per-script timing, auto-warnings)
+- OpenTelemetry instrumentation (`--otel-endpoint`)
+- Resilience (retry with exponential backoff, circuit breaker)
+- Plugin system (`ISqlDeployerPlugin` interface, NuGet-based discovery)
+
+✅ **ORM Integration** (New in v10.4.0)
+- SqlFactory (AnubisWorks) — reflection-based schema reader
+- EF Core — DbContext/DbSet discovery + DataAnnotations
+- Declarative schema apply (`sqldeployer schema apply` — desired state diff)
+- Computed rollback (auto-generated Down/ scripts)
+
 ✅ **Containerized Deployments**
 - Docker support
 - Kubernetes ready
@@ -37,7 +61,7 @@ SQL Migration Management and Deployment Tool
 
 ```bash
 # Install as global .NET tool
-dotnet tool install -g SqlDeployer.Cli
+dotnet tool install -g SqlDeployer
 
 # Verify installation
 sqldeployer --version
@@ -227,20 +251,60 @@ If you name your file with .EVERYTIME., SqlDeployer will run that file everytime
   
 Environment Name - This allows SqlDeployer to be environment aware and only run scripts that are in a particular environment based on the name of the script. 'sth.ENV.LOCAL.sql' would only be run if --env=LOCAL was set.
 
+## Enterprise Commands
+
+```bash
+# Check migration status
+sqldeployer status -c "..." --dt SQLServer
+
+# Validate scripts (hash integrity, tokens, orphaned records)
+sqldeployer validate -c "..." --dt SQLServer -f ./migrations
+
+# Lint SQL scripts (50 rules)
+sqldeployer lint -f ./migrations
+
+# Compare two database schemas
+sqldeployer diff -c "Server=A;..." --target-connectionstring "Server=B;..." --dt SQLServer
+
+# Detect schema drift
+sqldeployer drift -c "..." --dt SQLServer --snapshot ./baseline.json
+
+# Impact analysis before migration
+sqldeployer analyze -c "..." --dt SQLServer -f ./migrations
+
+# Simulate migration on shadow database
+sqldeployer simulate -c "..." --dt SQLite -f ./migrations
+
+# Manage encrypted connection vault
+sqldeployer vault set production -c "Server=prod;..."
+sqldeployer vault get production
+
+# Audit trail
+sqldeployer audit --export csv --export-path audit.csv
+
+# Schema from ORM
+sqldeployer schema from-sqlfactory --assembly ./MyApp.dll -o schema.json
+sqldeployer schema from-efcore --assembly ./MyApp.dll -o schema.json
+sqldeployer schema apply --schema-file schema.json -c "..."
+```
+
 ## Releases
 
 SqlDeployer releases are available on GitHub at [michalagata/SqlDeployer](https://github.com/michalagata/SqlDeployer).
 
 Each release includes:
 - Platform-specific ZIP archives (Linux, macOS, Windows)
+- NuGet dotnet tool package (`.nupkg`)
 - `version.txt` file containing the release version
 - `README.md` file with documentation
 
-### Downloading Releases
+### Installation Options
 
-You can download the latest release from the [GitHub Releases page](https://github.com/michalagata/SqlDeployer/releases). Select the appropriate ZIP file for your platform:
-- `SqlDeployer.Linux.zip` - For Linux x64 systems
-- `SqlDeployer.macOS.zip` - For macOS systems
-- `SqlDeployer.Windows.zip` - For Windows x64 systems
+```bash
+# Option 1: Install as global .NET tool (recommended)
+dotnet tool install -g SqlDeployer
 
-After downloading, extract the ZIP file and run the `SqlDeployer` executable from the extracted directory.
+# Option 2: Download from GitHub Releases
+# https://github.com/michalagata/SqlDeployer/releases
+# Select: SqlDeployer.Linux.zip / SqlDeployer.macOS.zip / SqlDeployer.Windows.zip
+```
